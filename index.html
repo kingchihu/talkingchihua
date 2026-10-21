@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ff7eb3">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Мой чихуахуа</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--glass:rgba(255,255,255,.6);--ink:#3b2a5a}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{height:100%;margin:0;overflow:hidden}
+body{font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;color:var(--ink);background:linear-gradient(160deg,#ffd6e8,#c9e4ff 55%,#d8ffe0);touch-action:manipulation}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:50;background:#ffd6e8}
+#app{height:100%;display:grid;gap:10px;padding:10px;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto auto;grid-template-areas:"stats""stage""acts""ward"}
+@media (min-aspect-ratio:1/1){#app{grid-template-columns:240px minmax(0,1fr) 240px;grid-template-rows:auto minmax(0,1fr);grid-template-areas:"stats stage ward""acts stage ward"}}
+.glass{background:var(--glass);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.8);border-radius:22px;box-shadow:0 8px 24px rgba(90,60,140,.16);padding:10px;transition:opacity .4s}
+#stats{grid-area:stats;display:grid;grid-template-columns:1fr 1fr;gap:6px 12px}
+@media (min-aspect-ratio:1/1){#stats{grid-template-columns:1fr}}
+.st{font-size:13px;font-weight:700}.bar{height:14px;border-radius:9px;background:rgba(60,40,100,.12);overflow:hidden;margin-top:3px}
+.fill{height:100%;width:50%;border-radius:9px;transition:width .7s cubic-bezier(.3,1.4,.5,1);background:linear-gradient(90deg,#ff7eb3,#ffb86b)}
+.low .fill{background:#ff4d4d;animation:pulse .9s infinite}
+@keyframes pulse{50%{opacity:.5}}
+#acts{grid-area:acts;display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+@media (min-aspect-ratio:1/1){#acts{grid-template-columns:1fr 1fr}}
+#ward{grid-area:ward;display:flex;flex-direction:column;gap:8px}
+#wl{display:flex;flex-wrap:wrap;gap:6px}
+#wl .btn,#ll .btn{flex:1 1 56px;padding:6px 4px;font-size:11px}
+.btn{border:0;border-radius:18px;padding:8px 4px;font:inherit;font-size:13px;font-weight:700;color:var(--ink);background:#fff;box-shadow:0 4px 0 rgba(90,60,140,.22);cursor:pointer;transition:transform .1s}
+.btn:active{transform:translateY(3px);box-shadow:none}.btn span{display:block;font-size:26px;line-height:1.1}
+.btn.on{background:#ffe27a;outline:3px solid #ffb800}
+.btn:focus-visible{outline:3px solid #5b8cff}
+.pbtn{padding:14px 8px;font-size:17px;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.35);background:linear-gradient(90deg,#ff3d81,#ffb800,#3dd6ff,#a259ff,#ff3d81);background-size:300% 100%;animation:shine 3s linear infinite}
+@keyframes shine{to{background-position:300% 0}}
+#stage{grid-area:stage;position:relative;overflow:hidden;border-radius:28px;min-height:0;display:flex;flex-direction:column;align-items:center;background:radial-gradient(circle at 50% 85%,#fff7c9,#ffd9ec 55%,#cfe3ff);box-shadow:0 10px 30px rgba(90,60,140,.25),inset 0 0 0 3px rgba(255,255,255,.7)}
+#stage>*{position:relative}
+#beams{position:absolute!important;inset:0;z-index:0;display:none;background:radial-gradient(circle at 50% 100%,#3a1a6e,#120a2e 70%);overflow:hidden}
+body.party #beams{display:block}
+.beam{position:absolute;top:-10%;width:30%;height:130%;background:linear-gradient(to bottom,var(--c),transparent 85%);clip-path:polygon(44% 0,56% 0,100% 100%,0 100%);transform-origin:50% 0;animation:sweep 2.4s ease-in-out infinite alternate;mix-blend-mode:screen;opacity:.75}
+@keyframes sweep{from{transform:rotate(-28deg)}to{transform:rotate(28deg)}}
+.strobe{position:absolute;inset:0;background:radial-gradient(circle,rgba(255,255,255,.3),transparent 70%);animation:strobe .6s steps(1) infinite}
+@keyframes strobe{50%{opacity:0}}
+#msg{z-index:5;margin-top:10px;padding:6px 14px;border-radius:16px;background:rgba(255,255,255,.85);font-weight:700;font-size:14px;box-shadow:0 4px 10px rgba(90,60,140,.15)}
+#dogwrap{z-index:1;flex:1;min-height:0;width:100%;display:flex;justify-content:center;align-items:flex-end}
+#dog{height:100%;max-width:100%;cursor:pointer;touch-action:manipulation;overflow:visible}
+#cakewrap{z-index:2;height:0;width:70%;max-width:340px;transition:height .9s cubic-bezier(.3,1.3,.5,1);overflow:hidden;display:flex;align-items:flex-end}
+body.party #cakewrap{height:34%}
+#cakewrap svg{width:100%;height:100%}
+.fl{transform-origin:center bottom;transform-box:fill-box;animation:flick .25s infinite alternate}
+@keyframes flick{to{transform:scale(1.15,.9) rotate(5deg)}}
+#cake.out .fl{display:none}
+#fxl,#fx{position:absolute!important;inset:0;pointer-events:none;z-index:4;width:100%;height:100%}
+.fx{position:absolute;font-size:38px;animation:rise 1.2s forwards;pointer-events:none}
+.fx.eat{animation:eat .9s forwards}
+@keyframes rise{from{opacity:1;transform:translateY(0) scale(1)}to{opacity:0;transform:translateY(-90px) scale(1.4)}}
+@keyframes eat{from{opacity:1;transform:translateY(-110px) scale(1.2)}to{opacity:0;transform:translateY(0) scale(.2)}}
+.bub{position:absolute;bottom:10%;border-radius:50%;background:radial-gradient(circle at 30% 30%,#fff,rgba(150,210,255,.5));border:1px solid rgba(255,255,255,.9);animation:bub 2.2s ease-out forwards;pointer-events:none}
+@keyframes bub{to{transform:translateY(-300px) translateX(var(--dx));opacity:0}}
+#food{position:absolute!important;bottom:10px;z-index:6;display:flex;gap:8px}
+#food .btn{padding:8px 12px}
+#pctl{position:absolute!important;bottom:12px;z-index:7;display:none}
+body.party #pctl{display:block}
+#pctl .btn{padding:12px 20px;font-size:17px}
+#night{position:absolute!important;inset:0;z-index:8;background:rgba(10,14,50,.82);display:none;color:#fff;font-size:60px;text-align:center;padding-top:12%;cursor:pointer}
+#night.show{display:block}
+#night b{display:block;font-size:30px;margin-top:6px;animation:pulse 2s infinite}
+#night small{display:block;font-size:13px;opacity:.7;margin-top:10px}
+#game{position:absolute!important;inset:0;z-index:9;display:none;background:rgba(255,255,255,.3)}
+#game.show{display:block}
+#gh{position:absolute;top:10px;left:50%;transform:translateX(-50%);padding:6px 16px;border-radius:16px;background:#fff;font-weight:700;z-index:2;box-shadow:0 4px 10px rgba(90,60,140,.2);white-space:nowrap}
+.it{position:absolute;top:-60px;font-size:46px;animation:fall linear forwards;cursor:pointer}
+@keyframes fall{to{top:105%}}
+.hide{display:none!important}
+#scene{position:absolute!important;inset:0;z-index:0}
+.loc{position:absolute;inset:0;width:100%;height:100%;display:none}.loc.on{display:block}
+#ll{display:flex;flex-wrap:wrap;gap:6px}
+#nm{z-index:5;margin-top:8px;padding:4px 14px;border-radius:16px;background:rgba(255,255,255,.85);font-weight:700;font-size:13px;text-align:center;box-shadow:0 4px 10px rgba(90,60,140,.15)}
+#nm+#msg{margin-top:6px}
+.inp{font:inherit;font-size:18px;padding:12px;border-radius:14px;border:2px solid #d9ccff;width:100%;color:var(--ink)}
+.row{display:flex;gap:8px;flex-wrap:wrap}.row .btn{flex:1}
+.sw{width:42px;height:42px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 2px #cdbfff;cursor:pointer;padding:0}.sw.on{box-shadow:0 0 0 4px #ff3d81}
+.row .btn.on{background:#ffe27a;outline:3px solid #ffb800}
+#toast{position:fixed;top:calc(env(safe-area-inset-top,0px) + 12px);left:50%;transform:translate(-50%,-150%);z-index:60;padding:10px 18px;border-radius:18px;background:#fff;box-shadow:0 8px 24px rgba(0,0,0,.25);font-weight:700;transition:transform .4s;max-width:90%;text-align:center}
+#toast.show{transform:translate(-50%,0)}
+.modal{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;background:rgba(40,20,80,.5);padding:16px}
+.modal.show{display:flex}
+.card{background:#fff;border-radius:26px;padding:18px;max-width:420px;width:100%;max-height:100%;overflow:auto;display:flex;flex-direction:column;gap:10px}
+.card h2{margin:0;font-size:20px}.card .btn{padding:12px;font-size:15px;box-shadow:0 3px 0 rgba(90,60,140,.22);background:#f1ecff}
+.card .big{background:linear-gradient(90deg,#ff3d81,#ff9a3d);color:#fff;font-size:17px}
+.how{font-size:13px;line-height:1.5;background:#f7f4ff;border-radius:14px;padding:10px}.how.flash{animation:pulse .4s 3}
+/* dog */
+#tail{transform-origin:200px 220px;transform-box:view-box;animation:wag 1s ease-in-out infinite alternate}
+.happy #tail{animation-duration:.15s}
+@keyframes wag{from{transform:rotate(-12deg)}to{transform:rotate(14deg)}}
+#eyes{transform-box:fill-box;transform-origin:center;animation:blink 4s infinite}
+@keyframes blink{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
+#dog{transform-origin:50% 95%}
+#dog.jump{animation:jump .55s}
+@keyframes jump{30%{transform:translateY(-40px) scale(.96,1.06)}60%{transform:translateY(0) scale(1.06,.94)}}
+#dog.dance{animation:dance 2.4s infinite}
+@keyframes dance{0%,25%,50%,75%{transform:translateY(0) rotate(-8deg)}12.5%,37.5%,62.5%{transform:translateY(-40px) rotate(8deg)}87%{transform:translateY(-30px) rotate(0)}100%{transform:translateY(0) rotate(360deg)}}
+#dog.shake{animation:shake .15s 8}
+@keyframes shake{50%{transform:rotate(3deg)}}
+#tongue,#eyesC,#zzz,.acc{display:none}
+.happy #tongue{display:block}.sleeping #eyes{display:none}.sleeping #eyesC{display:block}.sleeping #zzz{display:block}
+@media (prefers-reduced-motion:reduce){.beam,.strobe,.pbtn{animation:none}}
+</style>
+</head>
+<body>
+<div id="app">
+ <section id="stats" class="glass"></section>
+ <main id="stage">
+  <div id="scene">
+   <svg class="loc" viewBox="0 0 400 300" preserveAspectRatio="xMidYMax slice"><rect width="400" height="300" fill="#ffe9f3"/><rect y="215" width="400" height="85" fill="#e8b98a"/><path d="M0 215h400" stroke="#c98f5d" stroke-width="4"/><path d="M0 245h400M0 272h400" stroke="#d6a574" stroke-width="2"/><rect x="28" y="38" width="92" height="84" rx="6" fill="#bfe6ff" stroke="#fff" stroke-width="7"/><path d="M74 38v84M28 80h92" stroke="#fff" stroke-width="5"/><rect x="290" y="48" width="72" height="56" rx="4" fill="#ffd36b" stroke="#fff" stroke-width="5"/><circle cx="326" cy="76" r="14" fill="#ff9ac1"/><ellipse cx="200" cy="270" rx="150" ry="20" fill="#ff9ac1" opacity=".55"/><rect x="300" y="150" width="90" height="66" rx="16" fill="#8fb8ff"/><rect x="290" y="165" width="20" height="51" rx="9" fill="#6f9cf0"/></svg>
+   <svg class="loc" viewBox="0 0 400 300" preserveAspectRatio="xMidYMax slice"><rect width="400" height="300" fill="#bfe9ff"/><circle cx="330" cy="50" r="28" fill="#ffe03d"/><g fill="#fff"><ellipse cx="90" cy="55" rx="36" ry="14"/><ellipse cx="120" cy="46" rx="26" ry="14"/><ellipse cx="250" cy="90" rx="30" ry="11"/></g><path d="M0 200 Q100 170 200 200 T400 190 V300H0Z" fill="#a5e8a0"/><rect y="220" width="400" height="80" fill="#7fd97f"/><rect x="40" y="130" width="22" height="90" fill="#a9703d"/><circle cx="51" cy="110" r="42" fill="#3fb04a"/><circle cx="28" cy="135" r="28" fill="#4bc255"/><circle cx="76" cy="132" r="28" fill="#4bc255"/><g><circle cx="310" cy="250" r="5" fill="#ff5d8f"/><circle cx="340" cy="270" r="5" fill="#ffe03d"/><circle cx="150" cy="262" r="5" fill="#fff"/><circle cx="90" cy="280" r="5" fill="#ff5d8f"/></g></svg>
+   <svg class="loc" viewBox="0 0 400 300" preserveAspectRatio="xMidYMax slice"><rect width="400" height="300" fill="#aee6ff"/><circle cx="60" cy="55" r="30" fill="#ffe03d"/><rect y="150" width="400" height="75" fill="#4cc3e8"/><path d="M0 175q25-10 50 0t50 0t50 0t50 0t50 0t50 0t50 0t50 0" stroke="#fff" stroke-width="3" fill="none" opacity=".8"/><path d="M0 205q25-10 50 0t50 0t50 0t50 0t50 0t50 0t50 0t50 0" stroke="#fff" stroke-width="3" fill="none" opacity=".6"/><rect y="215" width="400" height="85" fill="#ffe2a0"/><rect x="318" y="150" width="5" height="90" fill="#8a5a2b"/><path d="M270 160 Q320 100 370 160Z" fill="#ff5d8f"/><path d="M295 148 Q320 100 345 148 Q320 160 295 148Z" fill="#fff" opacity=".6"/><path d="M60 250q10-8 20 0" stroke="#e0b86a" stroke-width="3" fill="none"/><circle cx="120" cy="270" r="6" fill="#ff9ac1"/></svg>
+   <svg class="loc" viewBox="0 0 400 300" preserveAspectRatio="xMidYMax slice"><rect width="400" height="300" fill="#0d0b2e"/><g fill="#fff"><circle cx="30" cy="30" r="1.5"/><circle cx="90" cy="70" r="2"/><circle cx="160" cy="25" r="1.5"/><circle cx="230" cy="60" r="2"/><circle cx="290" cy="20" r="1.5"/><circle cx="370" cy="90" r="2"/><circle cx="60" cy="140" r="1.5"/><circle cx="330" cy="160" r="1.5"/><circle cx="200" cy="110" r="1.5"/></g><circle cx="310" cy="70" r="34" fill="#ff8a5c"/><ellipse cx="310" cy="70" rx="58" ry="10" fill="none" stroke="#ffd9a8" stroke-width="4" transform="rotate(-18 310 70)"/><circle cx="80" cy="100" r="16" fill="#7fd6ff"/><path d="M0 235 Q200 215 400 235 V300H0Z" fill="#b8b3d9"/><g fill="#9a94c4"><ellipse cx="70" cy="262" rx="22" ry="6"/><ellipse cx="320" cy="272" rx="28" ry="7"/><ellipse cx="190" cy="285" rx="18" ry="5"/></g></svg>
+  </div>
+  <div id="beams">
+   <i class="beam" style="left:-8%;--c:#ff3d81"></i><i class="beam" style="left:14%;--c:#3dd6ff;animation-delay:-.8s"></i><i class="beam" style="left:36%;--c:#ffe03d;animation-delay:-1.6s"></i><i class="beam" style="left:58%;--c:#7dff6b;animation-delay:-.4s"></i><i class="beam" style="left:78%;--c:#b36bff;animation-delay:-1.2s"></i>
+   <div class="strobe"></div>
+  </div>
+  <div id="nm"></div><div id="msg">Привет! 🐾</div>
+  <div id="dogwrap">
+  <svg id="dog" viewBox="0 0 300 300" role="img" aria-label="Чихуахуа">
+   <ellipse cx="150" cy="288" rx="80" ry="9" fill="rgba(60,30,90,.18)"/>
+   <g id="tail"><path d="M198 222 Q252 195 244 150" stroke="#d99b5f" stroke-width="16" fill="none" stroke-linecap="round"/></g>
+   <rect x="106" y="236" width="26" height="46" rx="13" fill="#eebb85"/><rect x="168" y="236" width="26" height="46" rx="13" fill="#eebb85"/>
+   <ellipse cx="119" cy="282" rx="17" ry="8" fill="#fbe3c2"/><ellipse cx="181" cy="282" rx="17" ry="8" fill="#fbe3c2"/>
+   <ellipse cx="150" cy="212" rx="52" ry="48" fill="#eebb85"/><ellipse cx="150" cy="226" rx="32" ry="30" fill="#fbe3c2"/><g class="sp" style="display:none"><ellipse cx="172" cy="212" rx="24" ry="20" fill="#d99b5e"/></g>
+   <g id="g-suit" class="acc"><path d="M102 192 Q150 170 198 192 L202 242 Q150 264 98 242Z" fill="#4aa3ff"/><path d="M100 212 Q150 232 200 212 M99 228 Q150 248 201 228" stroke="#fff" stroke-width="6" fill="none"/></g>
+   <g id="earL"><path d="M98 104 L60 8 C92 22 126 52 138 96Z" fill="#d99b5f"/><path d="M104 96 L70 28 C94 40 114 62 126 92Z" fill="#ffb3c1"/></g>
+   <use href="#earL" transform="translate(300 0) scale(-1 1)"/>
+   <ellipse cx="150" cy="135" rx="62" ry="55" fill="#eebb85"/><ellipse cx="150" cy="160" rx="30" ry="21" fill="#fbe3c2"/>
+   <g class="sp" style="display:none"><ellipse cx="190" cy="102" rx="22" ry="18" fill="#d99b5e"/></g><circle cx="104" cy="152" r="9" fill="#ff9db5" opacity=".55"/><circle cx="196" cy="152" r="9" fill="#ff9db5" opacity=".55"/>
+   <g id="eyes"><ellipse cx="122" cy="125" rx="14" ry="17" fill="#2a1d1d"/><ellipse cx="178" cy="125" rx="14" ry="17" fill="#2a1d1d"/><circle cx="127" cy="118" r="5.5" fill="#fff"/><circle cx="183" cy="118" r="5.5" fill="#fff"/><circle cx="118" cy="131" r="2.5" fill="#fff"/><circle cx="174" cy="131" r="2.5" fill="#fff"/></g>
+   <g id="eyesC"><path d="M106 128 q16 12 32 0 M162 128 q16 12 32 0" stroke="#2a1d1d" stroke-width="4" fill="none" stroke-linecap="round"/></g>
+   <ellipse cx="150" cy="149" rx="10" ry="7" fill="#3a2a2a"/>
+   <path d="M150 156 v8 M150 164 q-10 8 -18 0 M150 164 q10 8 18 0" stroke="#3a2a2a" stroke-width="3" fill="none" stroke-linecap="round"/>
+   <g id="tongue"><ellipse cx="150" cy="173" rx="8" ry="10" fill="#ff6f91"/></g>
+   <g id="g-bow" class="acc"><path d="M150 192 L122 176 L122 208Z M150 192 L178 176 L178 208Z" fill="#e5383b"/><circle cx="150" cy="192" r="7" fill="#b5171a"/></g>
+   <g id="g-glasses" class="acc"><circle cx="122" cy="125" r="21" fill="rgba(120,200,255,.3)" stroke="#222" stroke-width="5"/><circle cx="178" cy="125" r="21" fill="rgba(120,200,255,.3)" stroke="#222" stroke-width="5"/><path d="M143 123 h14" stroke="#222" stroke-width="5"/></g>
+   <g id="g-hat" class="acc"><rect x="112" y="48" width="76" height="46" rx="6" fill="#262626"/><rect x="96" y="88" width="108" height="11" rx="5" fill="#262626"/><rect x="112" y="78" width="76" height="9" fill="#d33"/></g>
+   <g id="g-party" class="acc"><path d="M150 14 L116 94 Q150 104 184 94Z" fill="#ff4d9a"/><path d="M137 48 L163 48 M128 72 L172 72" stroke="#ffe03d" stroke-width="6"/><circle cx="145" cy="30" r="4" fill="#3dd6ff"/><circle cx="150" cy="12" r="9" fill="#ffe03d"/></g>
+   <g id="g-crown" class="acc"><path d="M108 92 L112 50 L130 72 L150 40 L170 72 L188 50 L192 92Z" fill="#ffd23d" stroke="#e0a800" stroke-width="3"/><circle cx="150" cy="40" r="5" fill="#ff3d81"/><circle cx="112" cy="50" r="4" fill="#3dd6ff"/><circle cx="188" cy="50" r="4" fill="#7dff6b"/></g>
+   <g id="g-scarf" class="acc"><path d="M104 184 Q150 206 196 184 L200 202 Q150 226 100 202Z" fill="#e5383b"/><path d="M130 199 h8 M152 205 h8 M174 199 h8" stroke="#fff" stroke-width="5"/><path d="M176 206 l10 36 l16 -6 l-8 -34Z" fill="#e5383b"/></g>
+   <text id="zzz" x="205" y="70" font-size="30" font-weight="700" fill="#5b6bff">Z z z</text>
+  </svg>
+  </div>
+  <div id="cakewrap">
+   <svg id="cake" viewBox="0 0 300 200">
+    <ellipse cx="150" cy="185" rx="140" ry="13" fill="#e9e3f7"/>
+    <rect x="40" y="125" width="220" height="58" rx="14" fill="#ff9ac1"/><rect x="40" y="125" width="220" height="12" rx="6" fill="#fff"/>
+    <rect x="72" y="84" width="156" height="45" rx="12" fill="#ffd36b"/><rect x="72" y="84" width="156" height="11" rx="5" fill="#fff"/>
+    <rect x="102" y="48" width="96" height="40" rx="10" fill="#9ad8ff"/><rect x="102" y="48" width="96" height="10" rx="5" fill="#fff"/>
+    <g fill="#ff3d81"><circle cx="70" cy="155" r="4"/><circle cx="110" cy="165" r="4"/><circle cx="150" cy="152" r="4"/><circle cx="190" cy="166" r="4"/><circle cx="230" cy="154" r="4"/></g>
+    <g><rect x="116" y="26" width="7" height="22" fill="#ff3d81"/><rect x="134" y="26" width="7" height="22" fill="#ffe03d"/><rect x="146" y="26" width="7" height="22" fill="#3dd6ff"/><rect x="159" y="26" width="7" height="22" fill="#7dff6b"/><rect x="177" y="26" width="7" height="22" fill="#b36bff"/></g>
+    <g fill="#ffb400"><ellipse class="fl" cx="119.5" cy="19" rx="5" ry="9"/><ellipse class="fl" cx="137.5" cy="19" rx="5" ry="9"/><ellipse class="fl" cx="149.5" cy="19" rx="5" ry="9"/><ellipse class="fl" cx="162.5" cy="19" rx="5" ry="9"/><ellipse class="fl" cx="180.5" cy="19" rx="5" ry="9"/></g>
+   </svg>
+  </div>
+  <div id="food" class="glass hide"><button class="btn" data-f="bone"><span>🦴</span>Косточка</button><button class="btn" data-f="meat"><span>🍖</span>Мясо</button><button class="btn" data-f="treat"><span>🍪</span>Лакомство</button></div>
+  <div id="fxl"></div><canvas id="fx"></canvas>
+  <div id="pctl"><button id="blow" class="btn">Задуть свечи 🕯️</button></div>
+  <div id="night">🌙<b>Z z z</b><small>Коснитесь, чтобы разбудить</small></div>
+  <div id="game"><div id="gh">Лови мячики! ⏱ 20 · 0</div></div>
+ </main>
+ <nav id="acts" class="glass">
+  <button class="btn" id="bFeed"><span>🍖</span>Кормить</button>
+  <button class="btn" id="bPlay"><span>🎾</span>Играть</button>
+  <button class="btn" id="bWash"><span>🛁</span>Мыть</button>
+  <button class="btn" id="bSleep"><span>💤</span>Спать</button>
+ </nav>
+ <aside id="ward" class="glass">
+  <button class="btn pbtn" id="bParty">Отпраздновать ДР! 🎉</button>
+  <div id="ll"></div><div id="wl"></div>
+  <button class="btn" id="bMenu">☰ Меню</button>
+ </aside>
+</div>
+<div id="toast"></div>
+<div id="menu" class="modal"><div class="card">
+ <h2>Меню</h2>
+ <button class="btn big" id="bInst">📲 Установить на телефон</button>
+ <div class="how" id="how"><b>iPhone (Safari):</b> нажмите «Поделиться» ⬆️ → «На экран Домой» → «Добавить».<br><b>Android (Chrome):</b> меню ⋮ → «Установить приложение» или «Добавить на главный экран».<br>Для установки откройте игру напрямую по ссылке в браузере.</div>
+ <button class="btn" id="bPet">🐶 Имя и окрас питомца</button>
+ <button class="btn" id="bNotif">🔔 Включить уведомления</button>
+ <button class="btn" id="bSpeed">⏩ Ускорить время ×20 (тест)</button>
+ <button class="btn" id="bSound">🔊 Звук: вкл</button>
+ <button class="btn" id="bReset">🔄 Начать заново</button>
+ <button class="btn" id="bClose">Закрыть</button>
+</div></div>
+<div id="pet" class="modal"><div class="card">
+ <h2>Мой питомец</h2>
+ <input id="pName" class="inp" maxlength="14" placeholder="Как зовут чихуахуа?" autocomplete="off">
+ <div class="row" id="pG"><button class="btn" data-g="m">🐶 Мальчик</button><button class="btn" data-g="f">🐕 Девочка</button></div>
+ <b>Окрас</b>
+ <div class="row" id="pC"></div>
+ <label class="row" style="align-items:center">Свой цвет <input type="color" id="pCol" value="#eebb85"></label>
+ <button class="btn" id="pSp">Пятнышки: выкл</button>
+ <button class="btn big" id="pOk">Готово</button>
+</div></div>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],rnd=(a,b)=>a+Math.random()*(b-a);
+const META=[['hun','🍎','Сытость'],['hap','😊','Счастье'],['ene','😴','Энергия'],['cle','🧼','Чистота']];
+const RATE={hun:.22,hap:.17,ene:.12,cle:.1};
+const e_=(a,b)=>pet.g==='f'?b:a,nm_=()=>pet.name||'Чихуахуа';
+const ALERT={hun:()=>`${nm_()} проголодал${e_('ся','ась')}! Зайдите покормить!`,hap:()=>`${nm_()} грустит. Поиграйте ${e_('с ним','с ней')}!`,ene:()=>`${nm_()} хочет спать!`,cle:()=>`${nm_()}: пора помыться!`};
+const SAY={hun:()=>e_('Я голоден! 🍖','Я голодна! 🍖'),hap:()=>'Мне скучно… поиграй со мной!',ene:()=>'Хочу спать… 💤',cle:()=>'Я грязнуля, помой меня! 🛁'};
+const FOOD={bone:{h:15,p:6,e:"🦴"},meat:{h:35,p:4,e:"🍖"},treat:{h:10,p:16,e:"🍪"}};
+const WEAR=[['glasses','🕶️','Очки'],['hat','🎩','Шляпа'],['bow','🎀','Бабочка'],['suit','👕','Костюм'],['party','🥳','Колпак'],['crown','👑','Корона'],['scarf','🧣','Шарф']];const HEAD=['hat','party','crown'];
+let S={hun:80,hap:80,ene:80,cle:80},worn={glasses:0,hat:0,bow:0,suit:0,party:0},speed=1,sound=1,sleeping=0,partyOn=0,gameOn=0,low={},swReg,dp,saved,loc=0,pet={name:'',g:'m',col:'#eebb85',sp:0,xp:0,lv:1,best:0};
+const dog=$('#dog');
+/* storage */
+function save(){try{localStorage.setItem('chi',JSON.stringify({S,worn:partyOn&&saved?saved:worn,sound,loc,pet,t:Date.now()}))}catch(e){}}
+function decay(dt){for(const k in RATE)S[k]=Math.max(0,S[k]-RATE[k]*dt)}
+try{const d=JSON.parse(localStorage.getItem('chi')||'null');if(d){S=d.S;worn=d.worn;sound=d.sound;loc=d.loc|0;pet=Object.assign(pet,d.pet||{});decay(Math.min((Date.now()-d.t)/1000,4*3600))}}catch(e){}
+/* audio */
+let AC;function ac(){if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}}if(AC&&AC.state==='suspended')AC.resume();return AC}
+function tone(f,d=.15,type='sine',v=.15,f2,w=0){if(!sound)return;const c=ac();if(!c)return;const o=c.createOscillator(),g=c.createGain(),t=c.currentTime+w;o.type=type;o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+d+.02)}
+const bark=()=>{tone(1100,.1,'sawtooth',.1,600);tone(1350,.09,'sawtooth',.08,700,.13)};
+const pop=()=>tone(600,.1,'triangle',.15,1300);
+const crunch=()=>[0,.07,.14,.21].forEach(w=>tone(rnd(160,260),.05,'square',.08,90,w));
+/* ui helpers */
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('show'),3500)}
+function notify(t){if(document.hidden&&window.Notification&&Notification.permission==='granted'){try{swReg&&swReg.active?swReg.showNotification(nm_()+' 🐶',{body:t}):new Notification(nm_()+' 🐶',{body:t})}catch(e){}}else toast(t)}
+function fx(e,cls='',dx=0){const d=document.createElement('div');d.className='fx '+cls;d.textContent=e;d.style.left=(50+dx+rnd(-8,8))+'%';d.style.top='42%';$('#fxl').append(d);setTimeout(()=>d.remove(),1300)}
+function replay(c,ms){dog.classList.remove(c);void dog.getBoundingClientRect();dog.classList.add(c);setTimeout(()=>dog.classList.remove(c),ms)}
+function happy(ms=2200){dog.classList.add('happy');clearTimeout(happy.t);happy.t=setTimeout(()=>dog.classList.remove('happy'),ms)}
+const clamp=k=>S[k]=Math.max(0,Math.min(100,S[k]));
+/* stats */
+$('#stats').innerHTML=META.map(([k,e,n])=>`<div class="st" id="s-${k}">${e} ${n}<div class="bar"><div class="fill"></div></div></div>`).join('');
+function render(){let mk=null,mv=101;for(const [k] of META){clamp(k);const el=$('#s-'+k);el.querySelector('.fill').style.width=S[k]+'%';el.classList.toggle('low',S[k]<20);if(S[k]<mv){mv=S[k];mk=k}}
+ if(!partyOn&&!sleeping)$('#msg').textContent=mv<20?SAY[mk]():mv<50?'Мне чего-то не хватает…':e_('Я счастлив! 🐾','Я счастлива! 🐾')}
+function tick(){const dt=speed;for(const k in RATE)S[k]-=RATE[k]*dt*(sleeping&&k!=='ene'?.4:1);
+ if(sleeping){S.ene+=3.5*dt;if(S.ene>=100){S.ene=100;wake()}}
+ for(const [k] of META){clamp(k);const l=S[k]<20;if(l&&!low[k])notify(ALERT[k]());low[k]=l}render()}
+setInterval(tick,1000);setInterval(save,4000);addEventListener('pagehide',save);
+/* wardrobe */
+$('#wl').innerHTML=WEAR.map(([k,e,n])=>`<button class="btn" data-w="${k}"><span>${e}</span>${n}</button>`).join('');
+function wear(){for(const [k] of WEAR){$('#g-'+k).style.display=worn[k]?'block':'none';$(`[data-w=${k}]`).classList.toggle('on',!!worn[k])}}
+$('#wl').onclick=e=>{const b=e.target.closest('[data-w]');if(!b||partyOn)return;const k=b.dataset.w;worn[k]=worn[k]?0:1;if(worn[k]&&HEAD.includes(k))HEAD.forEach(h=>{if(h!==k)worn[h]=0});wear();pop();happy(1200);replay('jump',550);save()};
+/* dog tap */
+dog.addEventListener('pointerdown',()=>{if(sleeping)return wake();bark();happy();replay('jump',550);fx(['❤️','💖','⭐'][Math.random()*3|0]);S.hap+=2;render()});
+/* feed */
+$('#bFeed').onclick=()=>{act();$('#food').classList.toggle('hide')};
+$('#food').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;const f=FOOD[b.dataset.f];S.hun+=f.h;S.hap+=f.p;xp(5);fx(f.e,'eat');crunch();happy(2500);setTimeout(()=>replay('jump',550),700);$('#food').classList.add('hide');render();save()};
+function act(){if(sleeping)wake();if(!gameOn)$('#food').classList.add('hide')}
+/* wash */
+$('#bWash').onclick=()=>{act();if(gameOn)return;for(let i=0;i<30;i++){const b=document.createElement('div');b.className='bub';const s=rnd(14,46);b.style.cssText=`width:${s}px;height:${s}px;left:${rnd(25,75)}%;--dx:${rnd(-60,60)}px;animation-delay:${rnd(0,.8)}s`;$('#fxl').append(b);setTimeout(()=>b.remove(),3200);tone(rnd(500,900),.06,'sine',.06,1400,rnd(0,1))}
+ replay('shake',1200);happy(2500);S.cle+=60;S.hap+=3;xp(6);render();save()};
+/* sleep */
+$('#bSleep').onclick=()=>{act();if(partyOn||gameOn)return;sleeping=1;$('#night').classList.add('show');dog.classList.add('sleeping');$('#msg').textContent=`Тсс… ${nm_()} спит 💤`;tone(300,.5,'sine',.08,150)};
+function wake(){sleeping=0;$('#night').classList.remove('show');dog.classList.remove('sleeping');bark();render()}
+$('#night').onclick=wake;
+/* mini-game */
+let sc=0,tl=0,gi,gt;
+$('#bPlay').onclick=()=>{act();if(gameOn||partyOn)return;gameOn=1;sc=0;tl=20;$('#game').classList.add('show');upd();
+ gi=setInterval(()=>{const d=document.createElement('div');d.className='it';const bomb=Math.random()<.2;d.textContent=bomb?'💣':['🎾','🦴','⚽','🥎'][Math.random()*4|0];d.style.left=rnd(4,86)+'%';d.style.animationDuration=rnd(2.2,3.8)+'s';d.onpointerdown=()=>{d.remove();if(bomb){sc=Math.max(0,sc-3);tone(120,.3,'sawtooth',.15,40);replay('shake',600)}else{sc++;pop()}upd()};d.onanimationend=()=>d.remove();$('#game').append(d)},550);
+ gt=setInterval(()=>{tl--;upd();if(tl<=0)endGame()},1000)};
+function upd(){$('#gh').textContent=`Лови мячики! ⏱ ${tl} · 🏆 ${sc}`}
+function endGame(){clearInterval(gi);clearInterval(gt);$$('.it').forEach(e=>e.remove());pet.best=Math.max(pet.best||0,sc);xp(sc);$('#gh').textContent=`Счёт: ${sc} 🎉 · рекорд ${pet.best}`;S.hap+=Math.min(45,5+sc*3);S.ene-=10;S.hun-=5;happy(3000);replay('jump',550);bark();render();save();setTimeout(()=>{$('#game').classList.remove('show');gameOn=0},1800)}
+/* confetti / fireworks */
+const cv=$('#fx'),cx=cv.getContext('2d');let P=[],run=0;
+function rs(){const d=devicePixelRatio||1;cv.width=cv.clientWidth*d;cv.height=cv.clientHeight*d;cx.setTransform(d,0,0,d,0,0)}addEventListener('resize',rs);new ResizeObserver(rs).observe($('#stage'));rs();
+function confetti(n,x,y){const C=['#ff3d81','#ffe03d','#3dd6ff','#7dff6b','#b36bff','#ff9a3d'];for(let i=0;i<n;i++)P.push({x,y,vx:rnd(-7,7),vy:rnd(-15,-4),g:.35,c:C[i%6],s:rnd(6,12),r:rnd(0,6),vr:rnd(-.4,.4),life:150,t:'c'});go()}
+function firework(x,y){const h=rnd(0,360);for(let i=0;i<80;i++){const a=rnd(0,6.28),s=rnd(1,6.5);P.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,g:.06,c:`hsl(${h+rnd(-20,20)} 100% 60%)`,s:3,life:75,t:'f'})}tone(rnd(200,400),.4,'sawtooth',.1,60);tone(1500,.3,'triangle',.06,300,.15);go()}
+function go(){if(!run){run=1;requestAnimationFrame(loop)}}
+function loop(){cx.clearRect(0,0,cv.clientWidth,cv.clientHeight);P=P.filter(p=>p.life>0&&p.y<cv.clientHeight+30);for(const p of P){p.x+=p.vx;p.y+=p.vy;p.vy+=p.g;p.life--;p.vx*=p.t==='f'?.985:.995;cx.globalAlpha=Math.min(1,p.life/30);cx.fillStyle=p.c;if(p.t==='c'){p.r+=p.vr;cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);cx.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);cx.restore()}else{cx.beginPath();cx.arc(p.x,p.y,p.s,0,6.28);cx.fill()}}
+ cx.globalAlpha=1;P.length?requestAnimationFrame(loop):run=0}
+/* party */
+const MEL=[523,659,784,659,523,659,784,1047,988,784,880,784,659,523,587,659,523,659,784,659,523,659,784,1047,1175,1047,988,880,784,659,784,523],BASS=[131,131,196,196,175,175,196,196];let mus,step=0,pc;
+function startMusic(){stopMusic();mus=setInterval(()=>{const i=step++%MEL.length;tone(MEL[i],.18,'square',.05);if(i%2===0)tone(BASS[(i>>2)%8],.3,'triangle',.12);if(i%4===0)tone(130,.12,'sine',.3,40)},190)}
+function stopMusic(){clearInterval(mus)}
+$('#bParty').onclick=()=>{if(partyOn)return;if(sleeping)wake();if(gameOn)endGame();$('#food').classList.add('hide');$('#menu').classList.remove('show');
+ partyOn=1;saved={...worn};worn.party=1;worn.hat=0;worn.crown=0;wear();$('#cake').classList.remove('out');$('#blow').textContent='Задуть свечи 🕯️';$('#blow').dataset.s='';
+ document.body.classList.add('party');dog.classList.add('dance');happy(9e5);$('#msg').textContent=`С Днём рождения, ${nm_()}! 🎂🎉`;startMusic();
+ const w=$('#stage').clientWidth,h=$('#stage').clientHeight;confetti(120,w/2,h*.6);pc=setInterval(()=>confetti(18,rnd(w*.2,w*.8),h*.4),1400)};
+$('#blow').onclick=()=>{const b=$('#blow');if(b.dataset.s==='end')return endParty();
+ $('#cake').classList.add('out');b.dataset.s='end';b.textContent='Завершить праздник';tone(900,.35,'sawtooth',.1,200);
+ const w=$('#stage').clientWidth,h=$('#stage').clientHeight;for(let i=0;i<8;i++)setTimeout(()=>firework(rnd(w*.15,w*.85),rnd(h*.12,h*.5)),i*350);setTimeout(()=>confetti(150,w/2,h*.7),400)};
+function endParty(){partyOn=0;clearInterval(pc);stopMusic();document.body.classList.remove('party');dog.classList.remove('dance','happy');worn=saved;saved=null;wear();S.hap=100;xp(25);happy(2500);bark();render();save()}
+/* menu / PWA */
+$('#bMenu').onclick=()=>$('#menu').classList.add('show');$('#bClose').onclick=()=>$('#menu').classList.remove('show');
+$('#menu').onclick=e=>{if(e.target.id==='menu')e.target.classList.remove('show')};
+$('#bSpeed').onclick=e=>{speed=speed===1?20:1;e.target.textContent=speed===1?'⏩ Ускорить время ×20 (тест)':'⏪ Обычная скорость времени'};
+$('#bSound').onclick=e=>{sound=sound?0:1;e.target.textContent=sound?'🔊 Звук: вкл':'🔇 Звук: выкл';save()};
+$('#bReset').onclick=()=>{S={hun:80,hap:80,ene:80,cle:80};worn={glasses:0,hat:0,bow:0,suit:0,party:0};wear();render();save();$('#menu').classList.remove('show')};
+$('#bNotif').onclick=async()=>{if(!window.Notification)return toast('Этот браузер не поддерживает уведомления');try{const r=await Notification.requestPermission();toast(r==='granted'?'Уведомления включены ✅':'Разрешение не выдано. Проверьте настройки браузера.');if(r==='granted')new Notification(nm_()+' 🐶',{body:'Буду напоминать, когда понадоблюсь!'})}catch(e){toast('Уведомления здесь недоступны')}};
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e});
+$('#bInst').onclick=()=>{if(dp){dp.prompt();dp=null}else{const h=$('#how');h.classList.remove('flash');void h.offsetWidth;h.classList.add('flash')}};
+try{const icon='data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#ffb3d1"/><text x="50" y="70" font-size="60" text-anchor="middle">🐶</text></svg>');
+ const l=document.createElement('link');l.rel='manifest';l.href=URL.createObjectURL(new Blob([JSON.stringify({name:'Мой чихуахуа',short_name:'Чихуахуа',start_url:location.href.split('#')[0],display:'standalone',background_color:'#ffd6e8',theme_color:'#ff7eb3',icons:[{src:icon,sizes:'512x512',type:'image/svg+xml'}]})],{type:'application/manifest+json'}));document.head.append(l)}catch(e){}
+try{if('serviceWorker' in navigator){const sw="self.addEventListener('install',e=>self.skipWaiting());self.addEventListener('activate',e=>e.waitUntil(clients.claim()));self.addEventListener('fetch',()=>{});self.addEventListener('notificationclick',e=>{e.notification.close();e.waitUntil(clients.matchAll().then(c=>c[0]&&c[0].focus()))});";
+ navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'text/javascript'}))).then(r=>swReg=r).catch(()=>{})}}catch(e){}
+const LOC=[['🏠','Дом'],['🌳','Парк'],['🏖️','Пляж'],['🚀','Космос']];
+$('#ll').innerHTML=LOC.map(([e,n],i)=>`<button class="btn" data-l="${i}"><span>${e}</span>${n}</button>`).join('');
+function setLoc(i,snd){loc=i;$$('.loc').forEach((e,j)=>e.classList.toggle('on',j===i));$$('[data-l]').forEach(b=>b.classList.toggle('on',+b.dataset.l===i));if(snd){pop();happy(1500);replay('jump',550);fx(LOC[i][0]);save()}}
+$('#ll').onclick=e=>{const b=e.target.closest('[data-l]');if(b)setLoc(+b.dataset.l,1)};
+setLoc(loc);
+/* питомец: имя, окрас, уровень */
+const COLS=[['#eebb85','Рыжий'],['#8b5a3c','Шоколадный'],['#3d3535','Чёрный'],['#f4ede4','Белый'],['#a9a9b8','Серый'],['#e8c98a','Кремовый']],HC={'#eebb85':'m','#d99b5f':'d','#fbe3c2':'l','#d99b5e':'sp'};
+dog.querySelectorAll('[fill],[stroke]').forEach(el=>['fill','stroke'].forEach(a=>{const t=HC[el.getAttribute(a)];if(t){el.dataset.t=t;el.dataset.a=a}}));
+function hsl(h){const[r,g,b]=[1,3,5].map(i=>parseInt(h.substr(i,2),16)/255),M=Math.max(r,g,b),m=Math.min(r,g,b),l=(M+m)/2,d=M-m,s=d?d/(1-Math.abs(2*l-1)):0;let H=0;if(d)H=M===r?((g-b)/d+6)%6:M===g?(b-r)/d+2:(r-g)/d+4;return[H*60,s*100,l*100]}
+function paint(){const[H,s,l]=hsl(pet.col),f=(a,b)=>`hsl(${H|0},${a|0}%,${b|0}%)`,C={m:f(s,l),d:f(s,Math.max(8,l-14)),l:f(Math.min(s,55),Math.min(96,l+(l>60?10:20)))};C.sp=l<35?C.l:C.d;
+ dog.querySelectorAll('[data-t]').forEach(el=>el.setAttribute(el.dataset.a,C[el.dataset.t]));$$('.sp').forEach(e=>e.style.display=pet.sp?'block':'none');
+ $$('#pC .sw').forEach(b=>b.classList.toggle('on',b.dataset.c===pet.col));$('#pCol').value=pet.col;$('#pSp').textContent='Пятнышки: '+(pet.sp?'вкл':'выкл');$$('#pG [data-g]').forEach(b=>b.classList.toggle('on',b.dataset.g===pet.g))}
+function nmr(){$('#nm').innerHTML=`${nm_()} · ⭐ ${pet.lv}<div class="bar" style="width:90px;margin:3px auto 0;height:7px"><div class="fill" style="width:${pet.xp/(pet.lv*40)*100}%"></div></div>`}
+function xp(n){pet.xp+=n;while(pet.xp>=pet.lv*40){pet.xp-=pet.lv*40;pet.lv++;toast(`${nm_()}: уровень ${pet.lv}! 🎉`);confetti(70,$('#stage').clientWidth/2,$('#stage').clientHeight*.5);[523,659,784,1047].forEach((f,i)=>tone(f,.18,'triangle',.12,0,i*.1))}nmr()}
+$('#pC').innerHTML=COLS.map(([c,n])=>`<button class="sw" data-c="${c}" title="${n}" aria-label="${n}" style="background:${c}"></button>`).join('');
+$('#pC').onclick=e=>{const b=e.target.closest('.sw');if(b){pet.col=b.dataset.c;paint();save()}};
+$('#pCol').oninput=e=>{pet.col=e.target.value;paint()};$('#pCol').onchange=save;
+$('#pName').value=pet.name;$('#pName').oninput=e=>{pet.name=e.target.value.trim().slice(0,14);nmr();render()};
+$('#pG').onclick=e=>{const b=e.target.closest('[data-g]');if(b){pet.g=b.dataset.g;paint();render();save()}};
+$('#pSp').onclick=()=>{pet.sp=pet.sp?0:1;paint();save()};
+$('#pOk').onclick=()=>{$('#pet').classList.remove('show');save();bark();happy(2000);replay('jump',550);toast(`Знакомьтесь: ${nm_()}! 🐾`)};
+$('#bPet').onclick=()=>{$('#menu').classList.remove('show');$('#pet').classList.add('show')};
+paint();nmr();if(!pet.name)$('#pet').classList.add('show');
+wear();render();
+</script>
+</body>
+</html>
